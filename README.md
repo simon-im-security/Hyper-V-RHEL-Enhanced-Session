@@ -24,15 +24,15 @@ Prerequisites
 Installation Instructions
 -------------------------
 
-You can use the following command to download and execute the script directly:
+Ensure you have `sudo` privileges before running the script. You can use the following command to download, make executable, and execute the script directly:
 
     curl -o /tmp/configure_hyperv_esm_rhel.sh https://raw.githubusercontent.com/simon-im-security/Hyper-V-RHEL-Enhanced-Session/refs/heads/main/configure_hyperv_esm_rhel.sh && chmod +x /tmp/configure_hyperv_esm_rhel.sh && sudo /tmp/configure_hyperv_esm_rhel.sh
 
 This command performs the following actions:
 
-1.  **Downloads** the script to a temporary location (`/tmp/configure_hyperv_esm_rhel.sh`).
-2.  **Makes the script executable**.
-3.  **Runs the script with `sudo`** to ensure it has the necessary permissions.
+1. **Downloads** the script to a temporary location (`/tmp/configure_hyperv_esm_rhel.sh`).
+2. **Makes the script executable**.
+3. **Runs the script with `sudo`** to ensure it has the necessary permissions for installation.
 
 What the Script Does
 --------------------
