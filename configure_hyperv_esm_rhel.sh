@@ -52,9 +52,17 @@ systemctl enable --now xrdp xrdp-sesman || { echo 'Failed to enable XRDP service
 
 # Modify XRDP configuration for Enhanced Session Mode with Hyper-V Sockets
 echo "Applying XRDP configuration adjustments for Enhanced Session Mode..."
+
+# Change port from default 3389 to a virtual socket (-1:3389) for Enhanced Session Mode.
 sed -i 's/port=3389/port=vsock:\/\/\-1:3389/g' /etc/xrdp/xrdp.ini
+
+# Set security layer to RDP to ensure compatibility with Enhanced Session Mode.
 sed -i 's/security_layer=negotiate/security_layer=rdp/g' /etc/xrdp/xrdp.ini
-sed -i 's/crypt_level=high/crypt_level=none/g' /etc/xrdp/xrdp.ini
+
+# Set cryptographic level to "high" to maintain secure sessions.
+sed -i 's/crypt_level=.*/crypt_level=high/g' /etc/xrdp/xrdp.ini
+
+# Disable bitmap compression to potentially improve performance in Enhanced Session Mode.
 sed -i 's/bitmap_compression=true/bitmap_compression=false/g' /etc/xrdp/xrdp.ini
 
 # Add Xorg configuration for graphical XRDP sessions
