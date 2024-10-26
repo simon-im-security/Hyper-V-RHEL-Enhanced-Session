@@ -24,7 +24,6 @@ platform_array=( $(grep -Eo '[^[:digit:]]+|[[:digit:]]+' <<< "$platform") )
 platform_name=$(echo "${platform_array[0]}")
 platform_version=$(echo "${platform_array[1]}")
 
-
 if [ "$platform_name" == "el" ]; then
     if [ "$platform_version" -gt 8 ]; then
         echo "RHEL version ($platform_version) is supported. Proceeding..."
@@ -46,6 +45,7 @@ fi
 # Install Hyper-V tools, XRDP components, and xrdp-selinux
 echo "Installing required packages: hyperv-tools, XRDP, and associated components including xrdp-selinux..."
 dnf install -y hyperv-tools xrdp xorgxrdp xrdp-selinux || { echo 'Failed to install required packages. Exiting...'; exit 1; }
+
 # Enable and start XRDP services
 echo "Enabling and starting XRDP services for Enhanced Session Mode support..."
 systemctl enable --now xrdp xrdp-sesman || { echo 'Failed to enable XRDP services. One or both services may not exist. Exiting...'; exit 1; }
@@ -81,7 +81,6 @@ echo "allowed_users=anybody" > /etc/X11/Xwrapper.config
 echo "Opening port 3389 for XRDP..."
 firewall-cmd --add-port=3389/tcp --permanent
 firewall-cmd --reload
-
 
 # Configure Pipewire for XRDP audio support
 echo "Installing dependencies for building Pipewire audio support for XRDP..."
