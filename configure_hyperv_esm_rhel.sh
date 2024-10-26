@@ -31,13 +31,10 @@ dnf install -y epel-release || { echo 'Failed to install EPEL repository. Exitin
 echo "Installing Hyper-V tools..."
 dnf install -y hyperv-tools || { echo 'Failed to install Hyper-V tools. Exiting...'; exit 1; }
 
-# Install EPEL repository
-echo "Installing EPEL repository..."
-dnf install -y epel-release
-
 # Install XRDP components
 echo "Installing XRDP and associated components..."
 dnf install -y xrdp xorgxrdp || { echo 'Failed to install XRDP components. Exiting...'; exit 1; }
+
 dnf install -y hyperv-tools xrdp xorgxrdp
 
 # Check and install xrdp-selinux if available
@@ -49,7 +46,7 @@ if ! dnf install -y xrdp-selinux; then
     git clone https://github.com/neutrinolabs/xrdp.git
     cd xrdp
     dnf install -y selinux-policy-devel || { echo 'Failed to install selinux-policy-devel. Exiting...'; exit 1; }
-    make || { echo 'Failed to make. Exiting...'; exit 1; } -f selinux/Makefile || { echo 'Failed to build xrdp-selinux. Exiting...'; exit 1; }
+    make -f selinux/Makefile || { echo 'Failed to build xrdp-selinux. Exiting...'; exit 1; }
     semodule -i selinux/xrdp.pp || { echo 'Failed to install xrdp-selinux module. Exiting...'; exit 1; }
     popd
     rm -rf /tmp/xrdp
@@ -70,8 +67,8 @@ if ! rpm -q xrdp; then
     cd xrdp
     ./bootstrap || { echo 'Failed to bootstrap. Exiting...'; exit 1; }
     ./configure || { echo 'Failed to configure. Exiting...'; exit 1; }
-    make
-    make install || { echo 'Failed to install. Exiting...'; exit 1; }
+    make || { echo 'Failed to make xrdp. Exiting...'; exit 1; }
+    make install || { echo 'Failed to install xrdp. Exiting...'; exit 1; }
     popd
     rm -rf /tmp/xrdp
 fi
@@ -81,17 +78,22 @@ if ! rpm -q xorgxrdp; then
     pushd /tmp
     git clone https://github.com/neutrinolabs/xorgxrdp.git
     cd xorgxrdp
-    ./bootstrap
-    ./configure
-    make
-    make install
+    ./bootstrap || { echo 'Failed to bootstrap xorgxrdp. Exiting...'; exit 1; }
+    ./configure || { echo 'Failed to configure xorgxrdp. Exiting...'; exit 1; }
+    make || { echo 'Failed to make xorgxrdp. Exiting...'; exit 1; }
+    make install || { echo 'Failed to install xorgxrdp. Exiting...'; exit 1; }
     popd
     rm -rf /tmp/xorgxrdp
 fi
 
 # Enable and start XRDP services
 echo "Enabling and starting XRDP services for Enhanced Session Mode support..."
-systemctl enable --now xrdp xrdp-sesman
+if systemctl list-unit-files | grep -q '^xrdp.service'; then
+    systemctl enable --now xrdp xrdp-sesman || { echo 'Failed to enable XRDP services. Exiting...'; exit 1; }
+else
+    echo "Error: XRDP services not found. Please check the installation. Exiting..."
+    exit 1
+fi
 
 # Modify XRDP configuration for Enhanced Session Mode with Hyper-V Sockets
 echo "Applying XRDP configuration adjustments for Enhanced Session Mode..."
@@ -113,10 +115,10 @@ echo "Cloning and building the Pipewire module for XRDP..."
 pushd /tmp
 git clone https://github.com/neutrinolabs/pipewire-module-xrdp.git
 cd pipewire-module-xrdp
-./bootstrap
-./configure
-make
-make install
+./bootstrap || { echo 'Failed to bootstrap Pipewire module. Exiting...'; exit 1; }
+./configure || { echo 'Failed to configure Pipewire module. Exiting...'; exit 1; }
+make || { echo 'Failed to make Pipewire module. Exiting...'; exit 1; }
+make install || { echo 'Failed to install Pipewire module. Exiting...'; exit 1; }
 popd
 rm -rf /tmp/pipewire-module-xrdp
 
