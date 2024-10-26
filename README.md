@@ -24,7 +24,7 @@ Prerequisites
 Installation Instructions
 -------------------------
 
-Ensure you have `sudo` privileges before running the script. You can use the following command to check for `sudo` privileges, download, make executable, and execute the script directly:
+Ensure you have `sudo` privileges before running the script. You can use the following command to check for sudo privileges, download, make executable, and execute the script directly:
 
 ```bash
 curl -o ~/configure_hyperv_esm_rhel.sh https://raw.githubusercontent.com/simon-im-security/Hyper-V-RHEL-Enhanced-Session/refs/heads/main/configure_hyperv_esm_rhel.sh && chmod +x ~/configure_hyperv_esm_rhel.sh && sudo ~/configure_hyperv_esm_rhel.sh
