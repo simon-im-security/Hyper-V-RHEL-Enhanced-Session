@@ -30,7 +30,7 @@ Ensure you have `sudo` privileges before running the script. You can use the fol
 if [ "$(id -u)" -ne 0 ]; then 
     echo "This script requires sudo privileges. Please run with sudo."
 else
-    curl -o /tmp/configure_hyperv_esm_rhel.sh https://raw.githubusercontent.com/simon-im-security/Hyper-V-RHEL-Enhanced-Session/refs/heads/main/configure_hyperv_esm_rhel.sh && chmod +x /tmp/configure_hyperv_esm_rhel.sh && sudo /tmp/configure_hyperv_esm_rhel.sh
+    sudo curl -o /tmp/configure_hyperv_esm_rhel.sh https://raw.githubusercontent.com/simon-im-security/Hyper-V-RHEL-Enhanced-Session/refs/heads/main/configure_hyperv_esm_rhel.sh && chmod +x /tmp/configure_hyperv_esm_rhel.sh && sudo /tmp/configure_hyperv_esm_rhel.sh
 fi
 ```
 
