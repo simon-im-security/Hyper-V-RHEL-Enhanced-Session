@@ -24,11 +24,12 @@ platform_array=( $(grep -Eo '[^[:digit:]]+|[[:digit:]]+' <<< "$platform") )
 platform_name=$(echo "${platform_array[0]}")
 platform_version=$(echo "${platform_array[1]}")
 
-el_supported=("8" "9")
 
 if [ "$platform_name" == "el" ]; then
-    if [[ ! ${el_supported[*]} =~ "$platform_version" ]]; then
-        echo "RHEL version ($platform_version) not supported, exiting..."
+    if [ "$platform_version" -gt 8 ]; then
+        echo "RHEL version ($platform_version) is supported. Proceeding..."
+    else
+        echo "RHEL version ($platform_version) is not supported, must be greater than 8. Exiting..."
         exit 1
     fi
 else
@@ -42,25 +43,9 @@ if [ "$platform_name" == "el" ]; then
     dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${platform_version}.noarch.rpm || { echo 'Failed to install EPEL repository. Exiting...'; exit 1; }
 fi
 
-# Install Hyper-V tools and XRDP components
-echo "Installing required packages: hyperv-tools, XRDP, and associated components..."
-dnf install -y hyperv-tools xrdp xorgxrdp
-
-# Check and install xrdp-selinux if available
-echo "Attempting to install xrdp-selinux..."
-if ! dnf install -y xrdp-selinux; then
-    echo "xrdp-selinux package not found in repositories. Attempting to build and install manually..."
-    # Clone, compile, and install xrdp-selinux manually
-    pushd /tmp
-    git clone https://github.com/neutrinolabs/xrdp.git
-    cd xrdp
-    dnf install -y selinux-policy-devel || { echo 'Failed to install selinux-policy-devel. Exiting...'; exit 1; }
-    make -f selinux/Makefile || { echo 'Failed to build xrdp-selinux. Exiting...'; exit 1; }
-    semodule -i selinux/xrdp.pp || { echo 'Failed to install xrdp-selinux module. Exiting...'; exit 1; }
-    popd
-    rm -rf /tmp/xrdp
-fi
-
+# Install Hyper-V tools, XRDP components, and xrdp-selinux
+echo "Installing required packages: hyperv-tools, XRDP, and associated components including xrdp-selinux..."
+dnf install -y hyperv-tools xrdp xorgxrdp xrdp-selinux || { echo 'Failed to install required packages. Exiting...'; exit 1; }
 # Enable and start XRDP services
 echo "Enabling and starting XRDP services for Enhanced Session Mode support..."
 systemctl enable --now xrdp xrdp-sesman || { echo 'Failed to enable XRDP services. One or both services may not exist. Exiting...'; exit 1; }
@@ -88,6 +73,7 @@ echo "allowed_users=anybody" > /etc/X11/Xwrapper.config
 echo "Opening port 3389 for XRDP..."
 firewall-cmd --add-port=3389/tcp --permanent
 firewall-cmd --reload
+
 
 # Configure Pipewire for XRDP audio support
 echo "Installing dependencies for building Pipewire audio support for XRDP..."
