@@ -1,7 +1,7 @@
 Hyper-V Enhanced Session Mode Configuration for RHEL 9+
 =======================================================
 
-This repository contains a script to configure **Enhanced Session Mode** (ESM) on RHEL 9 and newer versions when running on **Microsoft Hyper-V**.
+This script configures Enhanced Session Mode (ESM) on **Microsoft Hyper-V** for **RHEL 9+**.
 
 Benefits of Enhanced Session Mode
 ---------------------------------
