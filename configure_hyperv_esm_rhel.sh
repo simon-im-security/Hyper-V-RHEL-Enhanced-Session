@@ -25,7 +25,13 @@ fi
 
 # Install EPEL repository
 echo "Installing EPEL repository..."
-dnf install -y epel-release || { echo 'Failed to install EPEL repository. Exiting...'; exit 1; }
+echo 'Downloading and installing EPEL repository manually...'
+wget https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm -O /tmp/epel-release-latest.rpm || { echo 'Failed to download EPEL release. Exiting...'; exit 1; }
+dnf install -y /tmp/epel-release-latest.rpm || { echo 'Failed to install EPEL release from downloaded package. Exiting...'; exit 1; }
+rm -f /tmp/epel-release-latest.rpm
+    dnf install -y /tmp/epel-release-latest.rpm || { echo 'Failed to install EPEL release from downloaded package. Exiting...'; exit 1; }
+    rm -f /tmp/epel-release-latest.rpm
+}
 
 # Install Hyper-V tools
 echo "Installing Hyper-V tools..."
