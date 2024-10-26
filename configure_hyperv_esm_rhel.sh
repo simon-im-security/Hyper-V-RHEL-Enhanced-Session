@@ -23,6 +23,10 @@ if [ "$major_version" -lt 9 ]; then
     exit 1
 fi
 
+# Install EPEL repository
+echo "Installing EPEL repository..."
+dnf install -y epel-release
+
 # Install Hyper-V tools and XRDP components
 echo "Installing required packages: hyperv-tools, XRDP, and associated components..."
 dnf install -y hyperv-tools xrdp xrdp-selinux xorgxrdp
@@ -33,7 +37,7 @@ systemctl enable --now xrdp xrdp-sesman
 
 # Modify XRDP configuration for Enhanced Session Mode with Hyper-V Sockets
 echo "Applying XRDP configuration adjustments for Enhanced Session Mode..."
-sed -i 's/port=3389/port=vsock:\/\/-1:3389/g' /etc/xrdp/xrdp.ini
+sed -i 's/port=3389/port=vsock:\/\/\-1:3389/g' /etc/xrdp/xrdp.ini
 sed -i 's/security_layer=negotiate/security_layer=rdp/g' /etc/xrdp/xrdp.ini
 sed -i 's/crypt_level=high/crypt_level=high/g' /etc/xrdp/xrdp.ini
 sed -i 's/bitmap_compression=true/bitmap_compression=true/g' /etc/xrdp/xrdp.ini
@@ -54,7 +58,7 @@ cd pipewire-module-xrdp
 ./bootstrap
 ./configure
 make
-sudo make install
+make install
 popd
 rm -rf /tmp/pipewire-module-xrdp
 
