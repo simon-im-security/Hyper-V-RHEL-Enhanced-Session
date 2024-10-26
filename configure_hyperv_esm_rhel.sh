@@ -25,11 +25,69 @@ fi
 
 # Install EPEL repository
 echo "Installing EPEL repository..."
+dnf install -y epel-release || { echo 'Failed to install EPEL repository. Exiting...'; exit 1; }
+
+# Install Hyper-V tools
+echo "Installing Hyper-V tools..."
+dnf install -y hyperv-tools || { echo 'Failed to install Hyper-V tools. Exiting...'; exit 1; }
+
+# Install EPEL repository
+echo "Installing EPEL repository..."
 dnf install -y epel-release
 
-# Install Hyper-V tools and XRDP components
-echo "Installing required packages: hyperv-tools, XRDP, and associated components..."
-dnf install -y hyperv-tools xrdp xrdp-selinux xorgxrdp
+# Install XRDP components
+echo "Installing XRDP and associated components..."
+dnf install -y xrdp xorgxrdp || { echo 'Failed to install XRDP components. Exiting...'; exit 1; }
+dnf install -y hyperv-tools xrdp xorgxrdp
+
+# Check and install xrdp-selinux if available
+echo "Attempting to install xrdp-selinux..."
+if ! dnf install -y xrdp-selinux; then
+    echo "xrdp-selinux package not found in repositories. Attempting to build and install manually..."
+    # Clone, compile, and install xrdp-selinux manually
+    pushd /tmp
+    git clone https://github.com/neutrinolabs/xrdp.git
+    cd xrdp
+    dnf install -y selinux-policy-devel || { echo 'Failed to install selinux-policy-devel. Exiting...'; exit 1; }
+    make || { echo 'Failed to make. Exiting...'; exit 1; } -f selinux/Makefile || { echo 'Failed to build xrdp-selinux. Exiting...'; exit 1; }
+    semodule -i selinux/xrdp.pp || { echo 'Failed to install xrdp-selinux module. Exiting...'; exit 1; }
+    popd
+    rm -rf /tmp/xrdp
+fi
+
+# Verify and install missing hyperv-tools if not found in the default repo
+echo "Checking installation of hyperv-tools..."
+if ! rpm -q hyperv-tools; then
+    echo "hyperv-tools not found in repositories. Attempting to install from alternative source..."
+    dnf install -y hyperv-daemons hyperv-daemons-license hyperv-daemons-tools || { echo 'Failed to install alternative Hyper-V tools. Exiting...'; exit 1; }
+fi
+
+# Verify and install xrdp and xorgxrdp if they are not found
+if ! rpm -q xrdp; then
+    echo "xrdp package not found. Attempting to build and install manually..."
+    pushd /tmp
+    git clone https://github.com/neutrinolabs/xrdp.git
+    cd xrdp
+    ./bootstrap || { echo 'Failed to bootstrap. Exiting...'; exit 1; }
+    ./configure || { echo 'Failed to configure. Exiting...'; exit 1; }
+    make
+    make install || { echo 'Failed to install. Exiting...'; exit 1; }
+    popd
+    rm -rf /tmp/xrdp
+fi
+
+if ! rpm -q xorgxrdp; then
+    echo "xorgxrdp package not found. Attempting to build and install manually..."
+    pushd /tmp
+    git clone https://github.com/neutrinolabs/xorgxrdp.git
+    cd xorgxrdp
+    ./bootstrap
+    ./configure
+    make
+    make install
+    popd
+    rm -rf /tmp/xorgxrdp
+fi
 
 # Enable and start XRDP services
 echo "Enabling and starting XRDP services for Enhanced Session Mode support..."
@@ -48,7 +106,7 @@ sed -i '/^\[Xorg\]/,/^$/c\[Xorg]\nname=Xorg\nlib=libxup.so\nusername=ask\npasswo
 
 # Configure Pipewire for XRDP audio support
 echo "Installing dependencies for building Pipewire audio support for XRDP..."
-dnf install -y git gcc make autoconf libtool automake pkgconfig pipewire-devel
+dnf install -y git gcc make autoconf libtool automake pkgconfig pipewire-devel || { echo 'Failed to install dependencies for Pipewire. Exiting...'; exit 1; }
 
 # Clone, compile, and install the Pipewire module for XRDP
 echo "Cloning and building the Pipewire module for XRDP..."
