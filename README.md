@@ -53,14 +53,19 @@ Post-Installation Setup
 
 After running the script:
 
-1.  **Configure Enhanced Session Mode on the Hyper-V Host**:
+1.  **Verify Hyper-V PowerShell Module Availability**:
+    *   Open PowerShell as Administrator and run:
+    
+            Get-Module -ListAvailable -Name Hyper-V
+
+2.  **Configure Enhanced Session Mode on the Hyper-V Host**:
     *   Open the Hyper-V Manager, navigate to your VM settings, and enable **Guest Services** under **Management > Integration Services**.
-    *   Open a PowerShell session as Administrator on the Hyper-V host and run the following command to set the Enhanced Session Transport Type to `HVSocket`:
+    *   After confirming the Hyper-V module is available, open a PowerShell session as Administrator and run the following command to set the Enhanced Session Transport Type to `HVSocket`:
         
             Set-VM <VM_NAME> -EnhancedSessionTransportType HVSocket
         
         Replace `<VM_NAME>` with the name of your VM.
 
-2.  **Reboot the VM**: Rebooting ensures that all configuration changes are applied correctly.
+3.  **Reboot the VM**: Rebooting ensures that all configuration changes are applied correctly.
 
 ---
