@@ -24,48 +24,14 @@ Prerequisites
 Installation Instructions
 -------------------------
 
-Ensure you have `sudo` privileges before running the script. You can use the following command to download, make executable, and execute the script directly:
+Ensure you have `sudo` privileges before running the script. You can use the following command, which includes a `sudo` check at the beginning, to download, make executable, and execute the script directly:
 
+```bash
+if [ "$(id -u)" -ne 0 ]; then 
+    echo "This script requires sudo privileges. Please run with sudo."
+else
     curl -o /tmp/configure_hyperv_esm_rhel.sh https://raw.githubusercontent.com/simon-im-security/Hyper-V-RHEL-Enhanced-Session/refs/heads/main/configure_hyperv_esm_rhel.sh && chmod +x /tmp/configure_hyperv_esm_rhel.sh && sudo /tmp/configure_hyperv_esm_rhel.sh
-
-This command performs the following actions:
-
-1. **Downloads** the script to a temporary location (`/tmp/configure_hyperv_esm_rhel.sh`).
-2. **Makes the script executable**.
-3. **Runs the script with `sudo`** to ensure it has the necessary permissions for installation.
-
-What the Script Does
---------------------
-
-The script performs the following configuration steps:
-
-1.  **OS Compatibility Check**: Ensures the VM is running RHEL 9 or newer.
-2.  **Package Installation**: Installs `hyperv-tools`, `xrdp`, `xrdp-selinux`, and `xorgxrdp` to provide RDP and graphical support.
-3.  **XRDP Configuration**: Adjusts XRDP settings to use the Hyper-V socket (`vsock`) for Enhanced Session Mode, enabling:
-    *   RDP protocol security
-    *   High encryption level
-    *   Bitmap compression for optimized graphics
-4.  **Audio Support Configuration**: Installs and configures Pipewire for XRDP audio redirection.
-5.  **Enables Services**: Enables and starts XRDP services for Enhanced Session Mode.
-
-Post-Installation Setup
------------------------
-
-After running the script:
-
-1.  **Verify Hyper-V PowerShell Module Availability**:
-    *   Open PowerShell as Administrator and run:
-    
-            Get-Module -ListAvailable -Name Hyper-V
-
-2.  **Configure Enhanced Session Mode on the Hyper-V Host**:
-    *   Open the Hyper-V Manager, navigate to your VM settings, and enable **Guest Services** under **Management > Integration Services**.
-    *   After confirming the Hyper-V module is available, open a PowerShell session as Administrator and run the following command to set the Enhanced Session Transport Type to `HVSocket`:
-        
-            Set-VM <VM_NAME> -EnhancedSessionTransportType HVSocket
-        
-        Replace `<VM_NAME>` with the name of your VM.
-
-3.  **Reboot the VM**: Rebooting ensures that all configuration changes are applied correctly.
+fi
+```
 
 ---
