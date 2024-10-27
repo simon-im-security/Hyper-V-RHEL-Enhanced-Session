@@ -62,9 +62,6 @@ sed -i 's/security_layer=negotiate/security_layer=rdp/g' /etc/xrdp/xrdp.ini
 # Set cryptographic level to "high" to maintain secure sessions.
 sed -i 's/crypt_level=.*/crypt_level=high/g' /etc/xrdp/xrdp.ini
 
-# Disable bitmap compression to potentially improve performance in Enhanced Session Mode.
-sed -i 's/bitmap_compression=true/bitmap_compression=false/g' /etc/xrdp/xrdp.ini
-
 # Add Xorg configuration for graphical XRDP sessions
 echo "Configuring XRDP to support graphical sessions using Xorg..."
 sed -i '/^\[Xorg\]/,/^$/c\[Xorg]\nname=Xorg\nlib=libxup.so\nusername=ask\npassword=ask\nport=-1\ncode=20' /etc/xrdp/xrdp.ini
